@@ -19,5 +19,5 @@ cp config_kvm linux/.config
 cp config_kvm linux-5.11.6/.config
 
 # 4. Build kernel
-make -C linux -j3
-make -C linux-5.11.6 -j3
+make -C linux
+make -C linux-5.11.6
