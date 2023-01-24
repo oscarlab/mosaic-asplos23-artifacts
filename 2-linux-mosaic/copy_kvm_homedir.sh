@@ -1,7 +1,14 @@
 #!/bin/bash
 
 DISK="disk.img"
+MNTPNT=`mktemp -d`
 
+function fail {
+	[ "$M1" = "1" ] && sudo umount $MNTPNT/dev
+	[ "$M0" = "1" ] && sudo umount $MNTPNT
+	rmdir $MNTPNT
+	exit $1
+}
 function run {
 	echo $@
 	$@
