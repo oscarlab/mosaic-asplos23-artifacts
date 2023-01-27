@@ -1,0 +1,231 @@
+Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2020.2 (win64) Build 3064766 Wed Nov 18 09:12:45 MST 2020
+| Date         : Wed Oct 19 17:08:22 2022
+| Host         : DESKTOP-7P4Q3CP running 64-bit major release  (build 9200)
+| Command      : report_timing_summary -max_paths 10 -file tabulationHash4_timing_summary_routed.rpt -pb tabulationHash4_timing_summary_routed.pb -rpx tabulationHash4_timing_summary_routed.rpx -warn_on_violation
+| Design       : tabulationHash4
+| Device       : 7a100t-csg324
+| Speed File   : -1  PRODUCTION 1.23 2018-06-13
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  No
+  Borrow Time for Max Delay Exceptions       :  Yes
+  Merge Timing Exceptions                    :  Yes
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock (0)
+2. checking constant_clock (0)
+3. checking pulse_width_clock (0)
+4. checking unconstrained_internal_endpoints (0)
+5. checking no_input_delay (47)
+6. checking no_output_delay (32)
+7. checking multiple_clock (0)
+8. checking generated_clocks (0)
+9. checking loops (0)
+10. checking partial_input_delay (0)
+11. checking partial_output_delay (0)
+12. checking latch_loops (0)
+
+1. checking no_clock (0)
+------------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock (0)
+------------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock (0)
+---------------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints (0)
+------------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay (47)
+-------------------------------
+ There are 47 input ports with no input delay specified. (HIGH)
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay (32)
+--------------------------------
+ There are 32 ports with no output delay specified. (HIGH)
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock (0)
+------------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks (0)
+--------------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops (0)
+---------------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay (0)
+------------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay (0)
+-------------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops (0)
+----------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+         NA           NA                     NA                   NA           NA           NA                     NA                   NA       -0.155       -0.155                       1                    33  
+
+
+Timing constraints are not met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock        Waveform(ns)         Period(ns)      Frequency(MHz)
+-----        ------------         ----------      --------------
+sys_clk_pin  {0.000 1.000}        2.000           500.000         
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+sys_clk_pin                                                                                                                                                    -0.155       -0.155                       1                    33  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    ----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  sys_clk_pin
+  To Clock:  sys_clk_pin
+
+Setup :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+Hold  :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+PW    :            1  Failing Endpoint ,  Worst Slack       -0.155ns,  Total Violation       -0.155ns
+---------------------------------------------------------------------------------------------------
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         sys_clk_pin
+Waveform(ns):       { 0.000 1.000 }
+Period(ns):         2.000
+Sources:            { clk }
+
+Check Type        Corner  Lib Pin  Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location        Pin
+Min Period        n/a     BUFG/I   n/a            2.155         2.000       -0.155     BUFGCTRL_X0Y16  clk_IBUF_BUFG_inst/I
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X4Y93     hashOutput_reg[0]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X44Y114   hashOutput_reg[10]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X48Y113   hashOutput_reg[11]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X12Y89    hashOutput_reg[12]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X10Y92    hashOutput_reg[13]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X41Y91    hashOutput_reg[14]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X36Y92    hashOutput_reg[15]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X12Y117   hashOutput_reg[16]/C
+Min Period        n/a     FDRE/C   n/a            1.000         2.000       1.000      SLICE_X10Y119   hashOutput_reg[17]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X4Y93     hashOutput_reg[0]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X12Y89    hashOutput_reg[12]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X44Y114   hashOutput_reg[10]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X41Y91    hashOutput_reg[14]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X10Y101   hashOutput_reg[19]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X35Y107   hashOutput_reg[22]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X32Y111   hashOutput_reg[24]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X5Y108    hashOutput_reg[26]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X8Y112    hashOutput_reg[27]/C
+Low Pulse Width   Fast    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X13Y112   hashOutput_reg[31]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X4Y93     hashOutput_reg[0]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X12Y89    hashOutput_reg[12]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X46Y94    hashOutput_reg[4]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X12Y106   hashOutput_reg[9]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X44Y114   hashOutput_reg[10]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X48Y113   hashOutput_reg[11]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X10Y92    hashOutput_reg[13]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X41Y91    hashOutput_reg[14]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X36Y92    hashOutput_reg[15]/C
+High Pulse Width  Slow    FDRE/C   n/a            0.500         1.000       0.500      SLICE_X12Y117   hashOutput_reg[16]/C
+
+
+
