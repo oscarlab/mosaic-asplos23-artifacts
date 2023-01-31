@@ -225,6 +225,9 @@ exec test-scripts/prun.sh graph500 1024 4 3163 0 &
 sleep 10
 ```
 
+We note that gem5's TELNET can be, at times, unstable. If you see a "connection refused error" for some specific configuration, we recommend re-running just the specific configuration.
+
+
 The above commands would generate an output in a format shown below:
 ```
 ----------------------------------------------------------
