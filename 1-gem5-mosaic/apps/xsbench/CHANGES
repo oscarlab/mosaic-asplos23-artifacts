@@ -1,0 +1,425 @@
+=====================================================================
+NEW IN VERSION 18
+=====================================================================
+- (Feature) Added in an option to
+  use an event based simulation algorithm as opposed to the default
+  history based algorithm. This mode can be enabled with the "-m
+  event" command line option. The central difference between the
+  default history based algorithm and the event based algorithm is
+  the dependence or independence of macroscopic cross section
+  lookups. In the default history based method, the simulation
+  parallelism is expressed over a large number of independent
+  particle "histories", with each particle history requiring (by
+  default) 34 sequential and dependent macroscopic cross section
+  lookups to be executed. In the event based method, all macroscopic
+  cross sections are pooled together in a way that allows them to
+  be executed independently in any order. On CPU architectures,
+  both algorithms run in approximately the same speed, though in
+  full Monte Carlo applications there are some added costs associated
+  with the event based method (namely, the need to frequently store
+  and load particle states) that are not represented in XSBench.
+  However, the model event based algorithm in XSBench is useful for
+  examining how the dependence or independence of the loop over
+  macroscopic cross sections may affect performance on different
+  computer architectures.
+
+  The event based mode in XSBench is very similar to the algorithm
+  expressed prior to v16 and before, so performance results collected
+  with v16 and previous should be comparable to performance results
+  collected with the event mode in v18. On most CPU architectures
+  and with most compilers, the history and event based methods run
+  in approximately the same time, with some CPUs showing a small
+  (less than 20%) speedup with the event based method.
+
+- Removed the "benchmark" feature that tested the code on different
+  numbers of threads. This was removed as it can easily be implemented
+  in shell script form, and unnecessarily complicated the code.
+
+- With the addition of the different event and history based options,
+  the main function of the code has been broken down into some
+  smaller functions. Notably, the main parallel simulation phase
+  has been moved to a history and event based function in the
+  "Simulation.c" file.
+
+- Slight change to some integer castings in the verification mode
+  to get consitent results between gnu and intel compilers. This
+  changed the correct verification checksums, which are automatically
+  checked against.
+
+=====================================================================
+NEW IN VERSION 17
+=====================================================================
+- In previous versions of XSBench, it was assumed that the method
+  of parallelism in the app would not be altered, as the app was
+  written to respect some loop dependencies of fully featured MC
+  applications. However, to foster more experimentation with
+  different methods of parallelizing the XS lookup kernel, we have
+  decided to add an extra loop (over particles) into XSBench so that
+  loop dependencies can be explicit in XSBench. This should make it
+  easier for people to optimize or port XSBench without worry that
+  they are breaking any implicit loop dependencies. All loop 
+  dependencies should now be apparent without requiring any knowledge
+  of full MC applications.
+
+  From a performance standpoint, the change does not really affect
+  anything regarding default performance, so performance results for
+  CPUs (run without modification of the source code) should be
+  virtually identical between v16 and v17.
+
+  XSBench now has its default OpenMP thread level parallelism
+  expressed over independent particle histories. Each particle
+  then executes 34 macro_xs lookups, which are dependent, meaning
+  that this loop cannot be parallelized as each iteration is
+  dependent on results from the previous iteration. For each
+  macro_xs, there is an independent inner loop over micro_xs lookups,
+  which is not parallelized by default in XSBench, but could be
+  if desired provided that atomic or controlled writes are used
+  for the reduction of the macroscopic XS vector.
+
+- (Performance) To re-iterate, there is no expected performance
+  change for CPU architectures running the default code. The addition
+  of the particle loop into the code was done only to allow those
+  altering the code to more transparently see loop dependencies as
+  to avoid parallelizing or pre-processing loops in a manner which
+  would not be possible in a real MC app.
+
+  There is a slight change in performance in the smaller problem
+  size due to the OpenMP dynamic work chunk size. In v16, this was
+  set as 1 macro_xs lookup per chunk. In v17, as we are now
+  parallelizing over particle histories, the minimum chunk size
+  is now effectively 34 macro_xs lookups. For the large problem,
+  the thread work scheduling overhead is small compared to the
+  cost of a macro_xs lookup, so there isn't any difference. It's
+  just in the small problem size where the scheduling overhead
+  begins to be significant so the performance difference between
+  v16 and v17 shows up. v16 can be made equivalent in performance
+  to v17 by simply increasing the dynamic chunk size on the
+  macro_xs OpenMP loop.
+
+- (Option) In support of this change, the user now has the ability
+  to alter the number of particle histories they want to simulate.
+  This can be controlled with the "-p" command line argument.
+  By default, 500,000 particle histories will be simulated.
+  This is now the recommended argument for users to adjust if
+  the want to increase/decrease the runtime of the problem. Real
+  MC simulations may use anywhere from O(10^5) to O(10^10)
+  particles per power iteration, so a wide range of values here
+  is acceptable. 
+
+- (Option) The number of lookups to perform per particle history.
+  This is the "-l" option, which defaults to 34.
+  This option previously referred to the total number of lookups,
+  but now refers to the number of lookups per particle.
+  The default value reflects the average number of XS lookups that
+  a particle will need over its lifetime in a light water reactor.
+  One may want to adjust this value if targeting a different
+  reactor type.
+
+- (Defaults) Due to the addition of the particle abstraction, the
+  default parameters were changed slightly. With a new default of
+  500,000 particles and 34 lookups/particle, a total of 17 million
+  XS lookups will be performed under the default configuration. This
+  is slightly larger to what was seen in v16, which only performed
+  15 million lookups.
+
+- (Optimization) Verification mode is now a lot faster due to how
+  the loop dependencies have been incorporated explicity into the
+  code. Verification mode no longer requires different threads to
+  share a locked RNG -- rather, the random seed is particle specific
+  so results should be consistent regardless of which thread is
+  handling which particle. In practice, I have found that verifcation
+  mode no longer results in a significant slow down. However, when
+  gathering performance results, it is still probably best not to
+  use verification mode, and to only use it after making changes to
+  the code to ensure it is getting the correct answer and that no
+  loop dependencies have been violated.
+
+- (IO Improvement) Verification mode now automatically checks against
+  the expected hash, rather than forcing the user to loop up the
+  correct hash from the readme to manually check. It will also warn
+  the user if an incorrect hash is generated.
+
+=====================================================================
+NEW IN VERSION 16
+=====================================================================
+- (Feature) Added in an alternative XS lookup algorithm (known
+  as the logarithmic hash-based lookup), that has recently been
+  adopted by OpenMC and MCNP. This can be selected via the
+  "-G hash" command line argument. Additionally, the number of
+  hash bins can be set with the "-h <# hash bins>" argument, with
+  a default of 10,000.
+
+  The hash algorithm is much more memory efficient than the
+  unionized energy (UEG) grid algorithm that is default in
+  XSBench, while providing comparable speed to the UEG. More
+  details regarding the hash algorithm are available in:
+  
+  Forrest B Brown. New hash-based energy lookup algorithm for monte
+  carlo codes. Trans. Am. Nucl. Soc., 111:659–662, 2014.
+
+  As compared to the UEG algorithm, the basic idea of the hash
+  algorithm is that the acceleration grid no longer points to the
+  exact indices in the nuclide energy grids, but rather indicates
+  a small range in the nuclide grids where the appropriate data is
+  found. While in the UEG method the nuclide data can be accessed
+  directly, with the hash grid a binary search will still need to 
+  be performed in the range indicated by the acceleration grid.
+  This is still efficient however, as with enough hash bins, the area
+  in the nuclide grid being searched is small so the binary search
+  will be very fast.
+
+  One important thing to note is that the energy levels in XSBench
+  are stored in terms of lethargy, so no call to log() is necessary
+  when hashing into the energy grid as would be the case in OpenMC.
+  However, this call is not expensive as compared to the high
+  latency and bandwidth requirements for accessing the XS data, so
+  it is not expected to be substantial that lethargy is used instead
+  of regular energy.
+
+  We tested the new algorithm on a Skylake 8180 system (dual socket,
+  with 56 cores and 112 threads total), and adjusted the number
+  of hash bins to determine the optimal default setting. We found
+  our results to be similar to those of Brown, with about 10,000
+  hash bins resulting in good performance while only adding around
+  10 MB of additional data on top of the basic nuclide grid data.
+  Performance was good, and was only about 10% slower than the UEG,
+  while being 2.38x faster than the nuclide grid search alone. In
+  summary, on the architecture tested, the UEG is still the fastest
+  algorithm but the hash algorithm provides only a 10% performance
+  decrease but at the benefit of only using about 200 MB compared
+  to 5,678 MB that the UEG method uses.
+
+  We also tested two versions of the hash lookup algorithm, one
+  where a binary search O(log(n)) is performed on the specified
+  range in the nuclide grids, and a second version where a regular
+  iterative search O(n) is performed. The reason for testing is
+  that if the search range is low enough (e.g., less than 8),
+  for hardware reasons it may be better to simply iterate through
+  rather than jumping around out of order as would be done with
+  the binary search. We found that the iterative algorithm was
+  much slower when there were few hash bins (as would be expected).
+  For higher numbers of hash bins, the iterative algorithm was
+  usually competitive with the binary one, but any small benefits
+  in performance (at best a few percent) were outweighed by the
+  significant performance losses when only a few bins were
+  present. So, for these reasons, the hash lookup algorithm in
+  XSBench always does binary searches on the nuclide grids.
+
+
+=====================================================================
+NEW IN VERSION 15
+=====================================================================
+- Improved the method by which the unionized energy grid (UEG) is
+  initialized. Considering the following input parameters:
+    - N_gp = Number of energy grid points each nuclide has
+    - N_nuc = Number of nuclides in the simulation
+  the old algorithm was: O(N_gp * N_nuc^2 * log2(N_gp))
+  the new algorithm is : O(N_gp * N_nuc^2)
+  In serial, the initialzation phase of the program runs
+  about 10x faster than it did in version 14. However, as the new
+  function results in false sharing issues in the UEG, it is not
+  parallelized so can still take a significant portion of runtime
+  when the code is run in parallel with high thread counts. On
+  all machines I tested, I found that the new serial method at
+  worst ran in the same walltime as the old parallel method.
+  When doing performance analysis, it is still recommended to
+  use higher XS lookup counts (as specified with the "-l" argument)
+  to wash out time spent in this initialization phase.
+- Removed the binary_search() function, as it is no longer used in
+  initialization due to the improvement listed above.
+- Added a warning to the program output to not profile the
+  initialization region of the code. By default, if running on a
+  powerful node with a high core count, the majority of the runtime
+  of the code with default settings may be spent in the initialization
+  phase, which will result in confusing or misleading performance
+  characteristics. It is therefore not recommended to profile the
+  initialization phase of the code, and to only profile the simulation
+  region of the code. If that is not practical, it is recommended to
+  use higher XS lookup counts (as specified with the "-l" argument)
+  to wash out time spent in initialization.
+- The above changes in version 15 have no performance impacts at all
+  on the simulation region of the code. The changes only improve
+  the speed of initialization to serve as a "quality of life"
+  improvement for those running the code.
+
+=====================================================================
+NEW IN VERSION 14
+=====================================================================
+- (Feature) Added in the ability to only use a nuclide grid via the
+  "-G nuclide" command line argument. This stops the code from
+  allocating and initializing the unionized energy grid, which
+  significantly reduces the amount of memory required. However,
+  lookups are much slower in this mode as now a binary search must
+  be performed for all nuclides for each macroscopic XS lookup
+  (instead of only once per macro XS lookup). This feature was added
+  as there was some interest in performance testing for this type
+  of lookup method.
+- Slight refactoring of arguments for the lookup functions to
+  specify the new grid type option.
+- Documentation was added for the new -G grid type command line
+  argument.
+
+=====================================================================
+NEW IN VERSION 13
+=====================================================================
+- (Feature) Added in the ability for XSBench to write out a binary
+  file containing a randomized XS dataset. The code is also capable
+  of reading in this file instead of generating a new XS dataset
+  each time the program is run. This feature may be useful for those
+  running in simulation environments where walltime minimization
+  is key for logistical reasons.
+
+- Minor refactoring/reorganization of code to make the code clearer
+  and easier to read. After many updates, the code had become a
+  little bloated and difficult to read, so a cleanup was in order.
+
+- Removed synthetic delay injection (via dummy FLOPS or loads).
+  These were not very useful or accurate and had not been used by
+  anyone after the initial analyses were done with them. As they were
+  definitely adding to the code bloat of the program, they were
+  removed.
+
+=====================================================================
+NEW IN VERSION 12
+=====================================================================
+- (Bugfix) The XL and XXL runtime options didn't work correctly.
+  The unionized energy grid overflowed the bounds of normal 4 byte
+  integers, and actually required use of 8 byte integers.
+
+  The variables "n_isotopes" and "n_gridpoints" have been refactored
+  to 8 byte long integers. All variables that use n_isotopes and
+  n_gridpoints as input have also been refactored to 8 byte longs.
+
+  Note that a simple "patch" from version 11 to version 12 can be
+  manually done by simply changing line 73 of GridInit.c to be a
+  long instead of an int. The more thorough refactoring done in v12
+  is done to "future proof" the code.
+
+=====================================================================
+NEW IN VERSION 11
+=====================================================================
+
+- Updated & greatly improved the PAPI capability of XSBench. Now
+  events can be tallied during multi-core. See README for more
+  info.
+
+- Added in option for thread sleep pause in between macro XS lookups.
+  Very similar to adding dummy flops, but a little cleaner.
+  
+  With as small as a 0.1 ms sleep, we get linear scaling with threads.
+  While this initially appears to confirm our initial suspicions
+  regarding memory contention / latency problems, I think the delays
+  resulting from the sleeps could potentially just be washing out
+  the scaling numbers. Even with just 0.1, over 15 million lookups,
+  the majority of the runtime (>90%) is just sleep, so scaling numbers
+  aren't very expressive anymore. Need to implement timers that
+  ignore the sleep parts.
+
+- Specified OpenMP schedule mode as 'dynamic'. This is the default
+  on most systems, but now it's set explicitly since it's a lot
+  faster than 'static' or other modes.
+
+- Added in a "benchmarking" mode, which will attempt all possible
+  thread combinations between 1 <= nthreads <= max_threads.
+  This helps to save considerable benchmarking time, as the
+  data structures can be re-used between runs rather than regenerated
+  each time. Benchmarking mode is enabled in the makefile.
+
+=====================================================================
+NEW IN VERSION 10
+=====================================================================
+
+- Changed verification mode to be more portable. The verification
+strategy introduced in version 9 had discrepancies on different
+platforms and compilers. This was due to reliance on the compiler
+provided rand() function producing a different series of random
+numbers than other implementations. Also, there were some issues
+with the associativity of floating point arithmetic. These issues
+have now all been solved, and the verification hash is consistent
+across all tested platforms.
+
+- Revised "XL" size parameters, as well as adding in an "XXL" size
+option. The XL size now uses 120GB of XS data. The XXL mode uses
+252GN of XS data. More details are in the verification section of the
+readme. 
+
+=====================================================================
+NEW IN VERSION 9
+=====================================================================
+
+- Added in new code verification mode. This can be toggled on in
+the makefile. When code is compiled and run, a hash of the results
+will be generated which can then be compared to other versions and
+configurations of XSBench. See readme for more details.
+
+- Moved PAPI def to makefile. Makes it easier to toggle.
+
+- Added -l command line option to set the number of cross section
+lookups performed by XSBench.
+
+=====================================================================
+NEW IN VERSION 8
+=====================================================================
+
+- Simplified command line interface (CLI) read in process. XSBench
+now supports a more traditional CLI, as follows:
+
+Usage: ./XSBench <options>
+Options include:
+  -n <threads>     Number of OpenMP threads to run
+    -s <size>        Size of H-M Benchmark to run (small, large, XL)
+	  -g <gridpoints>  Number of gridpoints per isotope
+	  Default is equivalent to: -s large
+
+- Updated README with new CLI usage details.
+
+- Fixed several typos in the XSBench Theory PDF.
+
+=====================================================================
+NEW IN VERSION 7
+=====================================================================
+
+- Added MPI support. Multithreaded run executes on all ranks.
+  Problem size or data is not subdivided - the exact same problem
+  is solved in parallel by all ranks. Only MPI communication is
+  a single reduce at the end to aggregate timing data. 
+  
+  To enable MPi mode, simply change the MPI flag in the makefile
+  to "MPI = yes". Make sure mpicc is available on your system.
+
+- Added in "XL" size option for a giant 277 GB energy grid. This
+  is unlikely to fit on a single node, but is useful for
+  experimentation purposes.
+
+- Removed "BGQ mode" CLI argument option, as it wasn't being used
+  by anything in the code anymore.
+
+=====================================================================
+NEW IN VERSION 6
+=====================================================================
+
+- Fixed small bug in calculate_micro_xs() function. Occasionally,
+  the index returned would be the last nuclidegridpoint for that
+  nuclide, causing the "high" energy point to be off the end of the
+  grid (likely into the next nuclide's energy grid). Added a check
+  to correct for when this occurs.
+
+  Note that this bug did not affect performance - only made the
+  calculation of XS's more "correct".
+
+=====================================================================
+NEW IN VERSION 5
+=====================================================================
+
+- Added ChangeLog
+
+- Moved source code files to src/ directory.
+
+- Updated README.txt file to enhance documentation
+
+- Added significant documentation with regards to theory
+  in the docs/XSBench_Theory.pdf file. The README.txt file is now
+  more of a quick-start & users guide, whereas the XSBench_Theory.pdf
+  guide covers the details and theory behind the code.
+
+=====================================================================

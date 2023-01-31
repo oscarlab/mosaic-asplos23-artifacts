@@ -1,0 +1,208 @@
+sudo ./build/X86/gem5.opt configs/example/fs.py --kernel /home/krishnan/gem5-linux/linux-4.17/vmlinux --disk-image /home/krishnan/gem5-linux/qemu-image.img --cpu-type X86KvmCPU --command-line "earlyprintk=ttyS0 console=ttyS0 lpj=7999923 root=/dev/hda" --caches --l2cache --mem-size 4096MB
+
+#compile gem5
+sudo scons -j5 build/X86/gem5.opt
+
+#iceberg fs simulation - iceberg full system run
+sudo ./build/X86/gem5.opt configs/example/fs.py --kernel /home/krishnan/gem5-linux/linux-4.17/vmlinux --disk-image /home/krishnan/iceberg-fs/iceberg.img --cpu-type X86KvmCPU --command-line "earlyprintk=ttyS0 console=ttyS0 lpj=7999923 root=/dev/sda" --caches --l2cache --mem-size 4096MB --tlb_num_entries 1024 --tlb_set_associativity_L1 4 --simulateIcebergTLB --toc_size 64
+
+#run graph500
+./m5 exit
+./Graph500/seq-list/seq-list -s 15 -e 15
+./m5 exit
+
+--debug-flags=Cache
+
+==with PWC run1==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 618706222
+('Ran a total of', 146.2237716365, 'simulated seconds')
+
+==with PWC run2==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 627092471
+('Ran a total of', 85.3337319625, 'simulated seconds')
+
+==with PWC run3==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 620394904
+('Ran a total of', 116.7874843465, 'simulated seconds')
+
+==with PWC run4==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 619262945
+('Ran a total of', 119.7551553585, 'simulated seconds')
+
+==with PWC run5==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 618622018
+('Ran a total of', 169.5363984605, 'simulated seconds')
+
+==with PWC run6==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 619221988
+('Ran a total of', 148.6778220285, 'simulated seconds')
+
+==with PWC run7==
+Simulated time in ROI: 2.68s
+Instructions executed in ROI: 619789021
+('Ran a total of', 134.7255647715, 'simulated seconds')
+
+==with PWC run8==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 620025017
+('Ran a total of', 792.8056468715, 'simulated seconds')
+
+==with PWC run9==
+Simulated time in ROI: 2.68s
+Instructions executed in ROI: 623633342
+('Ran a total of', 162.8234523405, 'simulated seconds')
+
+==with PWC run10==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 618356977
+('Ran a total of', 138.5105517095, 'simulated seconds')
+
+==with PWC run11==
+Simulated time in ROI: 2.68s
+Instructions executed in ROI: 619671268
+('Ran a total of', 147.9856178525, 'simulated seconds')
+
+==with PWc run12==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 619347752
+('Ran a total of', 127.3468166115, 'simulated seconds')
+
+==with PWC run13==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 618710257
+('Ran a total of', 112.723093978, 'simulated seconds')
+
+==with PWC run14==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619032732
+('Ran a total of', 113.8350294025, 'simulated seconds')
+
+==with PWC run15==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619036516
+('Ran a total of', 136.4290392495, 'simulated seconds')
+
+=================================================================
+
+==with PWC(4,3,2) run1==
+Simulated time in ROI: 2.68s
+Instructions executed in ROI: 625300726
+('Ran a total of', 222.9960250605, 'simulated seconds')
+
+==with PWC(4,3,2) run2==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619711317
+('Ran a total of', 1226.4606904925, 'simulated seconds')
+
+==with PWC(4,3,2) run3==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619644434
+('Ran a total of', 220.7751441785, 'simulated seconds')
+
+==with PWC(4,3,2) run4==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 624919048
+('Ran a total of', 314.8174928995, 'simulated seconds')
+
+==with PWC(4,3,2) run5==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 619405493
+('Ran a total of', 151.8372174225, 'simulated seconds')
+
+==with PWC(4,3,2) run6==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619007583
+('Ran a total of', 155.5522987885, 'simulated seconds')
+
+==with PWC(4,3,2) run7==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 619255231
+('Ran a total of', 178.1104310405, 'simulated seconds')
+
+==with PWC(4,3,2) run8==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 619236340
+('Ran a total of', 220.187581169, 'simulated seconds')
+
+==with PWC(4,3,2) run9==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619982983
+('Ran a total of', 122.3857188975, 'simulated seconds')
+
+==with PWC(4,3,2) run10==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 620205723
+('Ran a total of', 120.4078875015, 'simulated seconds')
+
+==with PWC(4,3,2) run11==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 618679121
+('Ran a total of', 106.1030693135, 'simulated seconds')
+
+=================================================================
+
+==without PWC run1==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 619845386
+('Ran a total of', 125.7902562615, 'simulated seconds')
+
+==without PWC run2==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 618350398
+('Ran a total of', 148.3176744275, 'simulated seconds')
+
+==without pwc run3==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619164298
+('Ran a total of', 187.2595658355, 'simulated seconds')
+
+==without PWC run4==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 619867985
+('Ran a total of', 641.4052111865, 'simulated seconds')
+
+==without PWC run5==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619418427
+('Ran a total of', 199.8817671965, 'simulated seconds')
+
+==without PWC run6==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 618842660
+('Ran a total of', 100.2457446835, 'simulated seconds')
+
+==without PWC run7==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 618849159
+('Ran a total of', 135.0119570135, 'simulated seconds')
+
+==without PWC run8==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 618998199
+('Ran a total of', 119.6528023665, 'simulated seconds')
+
+==without PWC run9==
+Simulated time in ROI: 2.65s
+Instructions executed in ROI: 619233626
+('Ran a total of', 202.1810120985, 'simulated seconds')
+
+==without PWC run10==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 619693379
+('Ran a total of', 134.9286261205, 'simulated seconds')
+
+==without PWC run11==
+Simulated time in ROI: 2.66s
+Instructions executed in ROI: 618307619
+('Ran a total of', 157.4971327775, 'simulated seconds')
+
+==without PWC run12==
+Simulated time in ROI: 2.67s
+Instructions executed in ROI: 619138002
+('Ran a total of', 127.6023654405, 'simulated seconds')
