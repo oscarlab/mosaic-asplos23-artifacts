@@ -70,7 +70,7 @@ Feel free to use other kernel versions if required.
 ./compile.sh
 ```
 ## 2.2 QEMU image setup for gem5 full system simulation
-By default, the script creates a QEMU image size of 10GB. 
+Create a 10GB QEMU image. 
 ```
 qemu-img create $QEMU_IMG_FILE 10g
 ```
