@@ -142,22 +142,22 @@ test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_IN
 To run graph500, xsbench, btree, gups sequentially (one after the other) with  2-way associativity with TOC size of 4 and TELNET port at 3160, with tiny inputs
 ```
 test-scripts/prun.sh graph500 2 4 3160 0 
-sleep 5
+sleep 10
 test-scripts/prun.sh xsbench 2 4 3160 0
-sleep 5
+sleep 10
 test-scripts/prun.sh btree 2 4 3160 0
-sleep 5 
+sleep 10
 test-scripts/prun.sh gups 2 4 3160 0
-sleep 5
+sleep 10
 ```
-To run all applications with large inputs
+To sequentially run all applications with large inputs
 ```
 test-scripts/prun.sh graph500 2 4 3160 1
-sleep 5
+sleep 60
 test-scripts/prun.sh xsbench 2 4 3160 1
-sleep 5
+sleep 60
 test-scripts/prun.sh btree 2 4 3160 1
-sleep 5
+sleep 60
 test-scripts/prun.sh gups 2 4 3160 1
 ```
 
