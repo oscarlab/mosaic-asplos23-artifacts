@@ -37,10 +37,11 @@ sudo mount /dev/nvme0n1p4  ~/ssd
 sudo chown -R $USER ~/ssd
 ```
 
-### 1.4 Now clone the repo
+### 1.4 Now clone the repo and "cd" into 1-gem5-mosaic
 ```
 cd ~/ssd
-git clone https://github.com/RutgersCSSystems/mosaic-asplos23-gem5
+git clone https://github.com/oscarlab/mosaic-asplos23-artifacts
+cd mosaic-asplos23-artifacts/1-gem5-mosaic
 ```
 
 ## (2) Compilation
