@@ -162,7 +162,7 @@ sleep 60
 test-scripts/prun.sh gups 2 4 3160 1
 ```
 
-To run btree, direct-mapped with TOC size of 4 and TELNET port at 3161, and use large inputs
+For direct-mapped TLBs (associativity=1) with TOC size of 4 and TELNET port at 3161, 
 ```
 test-scripts/prun.sh btree 1 16 3161 1
 ```
