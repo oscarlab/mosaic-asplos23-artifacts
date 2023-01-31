@@ -45,14 +45,21 @@ git clone https://github.com/RutgersCSSystems/mosaic-asplos23-gem5
 
 ## (2) Compilation
 ------------------------
+
 All the package installations before compilation use debian distribution and "apt-get"  
 
 ### 2.1 Setting the environmental variables
-MAKE sure to set the correct OS codename with scripts/setvars.sh. For example, 
+MAKE sure to set the correct OS codename with scripts/setvars.sh. 
+
+For example, 
 ```
 export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
 source scripts/setvars.sh $OS_RELEASE_NAME
 ```
+**Note: Anytime you logout or change sessions before or at the time of compilation or when running experiments, you 
+must set the environmental variables again** 
+
+
 
 ### 2.2 Compile gem5 and linux 4.17 kernel. 
 
