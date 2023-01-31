@@ -83,7 +83,7 @@ qemu-img create $QEMU_IMG_FILE 10g
 test-scripts/mount_qemu.sh
 sudo apt-get update
 sudo apt-get install build-essential g++
-exit //exit from the VM image root
+exit 
 ```
 ### 2.4 Copying applications and gem5 scripts to VM
 To copy all apps to the root folder inside the QEMU image, use the following
