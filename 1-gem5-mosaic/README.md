@@ -126,7 +126,13 @@ We support two workloads:
 (2) "large" input as used in the paper (could take several hours to days)
 
 
-### 3.1 Running gem5 simulator
+### 3.1 Setting the environmental variables
+```
+export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
+source scripts/setvars.sh $OS_RELEASE_NAME
+```
+
+### 3.2 Running the gem5 simulator
 ```
 test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_INPUT
 ```
@@ -177,7 +183,7 @@ To avoid manually logging into a VM and running an application, we use telnet
 and a specific PORT number.
 
 
-### 3.2 To run multiple instances simultaneously
+### 3.3 To run multiple instances simultaneously
 To run multiple instances in parallel, the instances could be run as background (interactive) tasks.
 Simply copy the block from each markdown file and paste it on the terminal for the long running jobs to begin.
 The number of jobs to launch depend on the number of cores, memory size, and available disk size.
@@ -198,13 +204,13 @@ For example, the following lines run graph500 varying the associativity, keeping
 Please make sure to use different port numbers.
 ```
 exec test-scripts/prun.sh graph500 2 4 3160 0 &
-sleep 5
+sleep 10
 exec test-scripts/prun.sh graph500 4 4 3161 0 &
-sleep 5
+sleep 10
 exec test-scripts/prun.sh graph500 8 4 3162 0 &
-sleep 5
+sleep 10
 exec test-scripts/prun.sh graph500 1024 4 3163 0 &
-sleep 5
+sleep 10
 ```
 
 The above commands would generate an output in a format shown below:
@@ -234,24 +240,23 @@ Mosaic TLB miss rate:0.6716%
 For large inputs (e.g., xsbench)
 ```
 exec test-scripts/prun.sh xsbench 2 4 3160 1 &
-sleep 5
+sleep 60
 exec test-scripts/prun.sh xsbench 4 4 3161 1 &
-sleep 5
+sleep 60
 exec test-scripts/prun.sh xsbench 8 4 3162 1 &
-sleep 5
+sleep 60
 exec test-scripts/prun.sh xsbench 1024 4 3163 1 &
-sleep 5
+sleep 60
 ```
 
-### 3.5 Setting TLB size
+### 3.4 Setting TLB size
 To change the default TLB size, in prun.sh, change the following:
 ```
 TLB_SIZE=1024 => TLB_SIZE=1536
 ```
 
 
-
-### 3.3 Changing application parameters
+### 3.5 Changing application parameters
 The inputs for tiny and large inputs for each application can be changed in the follow python scripts
 ```
 $BASE/test-scripts/gem5_client_tiny.py
@@ -264,7 +269,7 @@ commands = [b"/m5 exit\r\n", b"/seq-list -s 4 -e 4\r\n", b"/m5 exit\r\n" ]
 ```
 
 
-### 3.4 Forceful termination if required
+### 3.6 Forceful termination if required
 If you would like to terminate all scripts and gem5 simulation, one could use the following commands
 ```
 PID=`ps axf | grep Ways | grep -v grep | awk '{print $1}'`;kill -9 $PID
