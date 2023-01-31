@@ -9,7 +9,7 @@
 - 20-30GB disk for sequential runs and 100GB for parallel runs
 
 
-## (1.) Setting  Gem5 Mosaic on CloudLab (Skip to 2 if not using CloudLab)
+## (1) Setting  Gem5 Mosaic on CloudLab (Skip to 2 if not using CloudLab)
 -----------------------------------------------------------------------
 You have the option to run Gem5 Mosaic on CloudLab (which we used for
 development and experiments). If you do not want to use CloudLab, skip to 2.
@@ -21,8 +21,9 @@ We run the gem5 simulation in CloubLab and use its fast NVMe storage to speed up
 **Recommended Instance Types:** We recommend using m510 nodes in UTAH datacenter that have fast NVMe storage and are generally available.
 You could also use a pre-created profile, "2-NVMe-Nodes," which will launch two NVMe-based nodes to run several parallel instances.
 
-## 1.2 Partitioning an SSD and downloading the code.
-If you are using CloudLab, the root partitions only has 16GB (for example: m510 instances). 
+## 1.2 Creating an SSD partition and cloning the code on SSD.
+
+Before you clone the repo, if you are using CloudLab, the root partitions only has 16GB (for example: m510 instances). 
 First, set up the CloudLab node with SSD and download the code on the SSD folder.
 
 If you are using the m510 nodes (or 2-NVMe-Nodes profile), the NVMe SSD with 256GB is in
@@ -34,23 +35,22 @@ sudo mkfs.ext4 /dev/nvme0n1p4
 mkdir ~/ssd
 sudo mount /dev/nvme0n1p4  ~/ssd
 sudo chown -R $USER ~/ssd
-cd ~/ssd
 ```
 
 ### 1.4 Now clone the repo
 ```
+cd ~/ssd
 git clone https://github.com/RutgersCSSystems/mosaic-asplos23-gem5
 ```
 
-## (2.) Compilation
+## (2) Compilation
 ------------------------
 All the package installations before compilation use debian distribution and "apt-get"  
 
 ### 2.1 Setting the environmental variables
-MAKE sure to set the correct OS release by assigning the correct
-OS_RELEASE_NAME. In Debian distributions, this can be extracted using "lsb_release -a"
+MAKE sure to set the correct OS codename with scripts/setvars.sh. For example, 
 ```
-export OS_RELEASE_NAME="bionic"
+export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
 source scripts/setvars.sh $OS_RELEASE_NAME
 ```
 
@@ -62,9 +62,7 @@ Feel free to use other kernel versions if required.
 ./compile.sh
 ```
 ## 2.2 QEMU image setup for gem5 full system simulation
-By default, the script creates a QEMU image size of 10GB. If you 
-would like a larger image, in the image creation script added 
-below (create_qemu_img.sh), change the following line as needed. 
+By default, the script creates a QEMU image size of 10GB. 
 ```
 qemu-img create $QEMU_IMG_FILE 10g
 ```
@@ -72,10 +70,7 @@ qemu-img create $QEMU_IMG_FILE 10g
 ./create_qemu_img.sh
 ```
 
-### 2.3 Mount the QEMU image
-A successful mount followed by "df" command will show the mounted 
-directory. Some VMs might not have /bin/tcsh. So, we will manually 
-copy to the VM disk file.
+### 2.3 Mount the QEMU image  
 ```
 test-scripts/mount_qemu.sh
 sudo apt-get update
@@ -88,19 +83,14 @@ command. In addition to the application, we also copy the m5 application
 required for letting the gem5 host for starting and stoping the simulation.
 ```
 $BASE/test-scripts/copyapps_qemu.sh
-(or)
-sudo cp -r apps/* $BASE/mountdir/
 ```
 
 ### 2.5 Setting the password for QEMU VM
-- Set the username for the VM to root
 - Set the VM image password to the letter "s". This is just a QEMU gem5 VM and will not cause any 
 issues. *We will make them configurable soon to avoid using a specific password.*
 
 ```
 test-scripts/mount_qemu.sh
-cd $BASE/mountdir
-sudo chroot .
 passwd
 ```
 Once the password is set, exit the VM and umount the image
@@ -125,7 +115,7 @@ In the AE, as evaluated in the paper, we have included the sample applications:
 
 We support two workloads: 
 (1) "tiny" input, with the smallest possible input to quickly check if everything works 
-( < 2 minutes for each application except gups and btree)
+( < 2 minutes for each application except gups and btree which would run for a longer time)
 (2) "large" input as used in the paper (could take several hours to days)
 
 
