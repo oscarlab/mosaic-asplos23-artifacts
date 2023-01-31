@@ -16,6 +16,7 @@ export QEMU_IMG_FILE=$QEMU_IMG/iceberg.img
 export MOUNT_DIR=$QEMU_IMG/mountdir
 export QEMUMEM="50G"
 export KERNEL=$BASE/KERNEL
+export OUTPUTDIR=$BASE/OUTPUT 
 
 #BENCHMARKS AND LIBS
 export LINUX_SCALE_BENCH=$BASE/linux-scalability-benchmark
