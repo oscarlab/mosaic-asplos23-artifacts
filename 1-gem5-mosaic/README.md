@@ -140,7 +140,7 @@ test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_IN
 **NOTE: For each WAYS and TOCSIZE configuration, a separate copy of the repo is generated along with the VM image, and the simulation is run from the copied folder. Please be mindful of the available disk and memory size.**
 
 #### Examples:
-To run graph500, xsbench, btree, gups sequentially (one after the other) with  2-way associativity with TOC size of 4 and TELNET port at 3160, with tiny inputs
+To run graph500, xsbench, btree, gups sequentially (one after the other) with  2-way associativity with TOC size of 4 and TELNET port at 3160, with **tiny input**
 ```
 test-scripts/prun.sh graph500 2 4 3160 0 
 sleep 10
