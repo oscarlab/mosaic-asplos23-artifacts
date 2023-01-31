@@ -152,36 +152,43 @@ test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_IN
 
 #### Examples:
 To run graph500, xsbench, btree, gups sequentially (one after the other) with  2-way associativity with TOC size of 4 and TELNET port at 3160, with **tiny input**
+
 ```
-test-scripts/prun.sh graph500 2 4 3160 0 
-sleep 10
-test-scripts/prun.sh xsbench 2 4 3160 0
-sleep 10
-test-scripts/prun.sh btree 2 4 3160 0
-sleep 10
-test-scripts/prun.sh gups 2 4 3160 0
-sleep 10
+export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
+source scripts/setvars.sh $OS_RELEASE_NAME
 ```
+
+```
+test-scripts/prun.sh graph500 2 4 10160 0 
+sleep 20
+test-scripts/prun.sh xsbench 2 4 10161 0
+sleep 20
+test-scripts/prun.sh btree 2 4 10162 0
+sleep 20
+test-scripts/prun.sh gups 2 4 10163 0
+sleep 20
+```
+
 To sequentially run all applications with large inputs
 ```
-test-scripts/prun.sh graph500 2 4 3160 1
+test-scripts/prun.sh graph500 2 4 10160 1
 sleep 60
-test-scripts/prun.sh xsbench 2 4 3160 1
+test-scripts/prun.sh xsbench 2 4 10161 1
 sleep 60
-test-scripts/prun.sh btree 2 4 3160 1
+test-scripts/prun.sh btree 2 4 10162 1
 sleep 60
-test-scripts/prun.sh gups 2 4 3160 1
+test-scripts/prun.sh gups 2 4 10163 1
 ```
 
 For direct-mapped TLBs (associativity=1) with TOC size of 4 and TELNET port at 3161, 
 ```
-test-scripts/prun.sh btree 1 16 3161 1
+test-scripts/prun.sh btree 1 16 10161 1
 ```
 
 For full associativity, we just specify the number of ways as TLB size. 
 For example, if the TLB_SIZE=1024 (default) 
 ```
-test-scripts/prun.sh graph500 1024 16 3162 0
+test-scripts/prun.sh graph500 1024 16 10162 0
 ```
 
 **Some notes:**
@@ -215,20 +222,19 @@ exec test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LAR
 For example, the following lines run graph500 varying the associativity, keeping the TOC size constant. 
 Please make sure to use different port numbers.
 ```
-exec test-scripts/prun.sh graph500 2 4 3160 0 &
-sleep 10
-exec test-scripts/prun.sh graph500 4 4 3161 0 &
-sleep 10
-exec test-scripts/prun.sh graph500 8 4 3162 0 &
-sleep 10
-exec test-scripts/prun.sh graph500 1024 4 3163 0 &
-sleep 10
+exec test-scripts/prun.sh graph500 2 4 10000 0 &
+sleep 20
+exec test-scripts/prun.sh graph500 4 4 10001 0 &
+sleep 20
+exec test-scripts/prun.sh graph500 8 4 10002 0 &
+sleep 20
+exec test-scripts/prun.sh graph500 1024 4 10003 0 
 ```
 
 We note that gem5's TELNET can be, at times, unstable. If you see a "connection refused error" for some specific configuration, we recommend re-running just the specific configuration.
 
 
-The above commands would generate an output in a format shown below:
+The above commands would generate a (sample) output in the format shown below:
 ```
 ----------------------------------------------------------
 RESULTS for WAYS 2 and TOC LEN 4
