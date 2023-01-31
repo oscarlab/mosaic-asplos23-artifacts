@@ -113,6 +113,17 @@ test-scripts/umount_qemu.sh
 echo "-1" | sudo tee /proc/sys/kernel/perf_event_paranoid
 ```
 
+### 2.7 Optional: Using MOSH to avoid SSH session termination
+Because some simulations run for days, one could use mosh-based SSH or screen to avoid termination of SSH session. 
+More details here: 
+
+To install and use mosh 
+```
+sudo apt-get install mosh
+mosh USER@host
+```
+
+
 ## (3.) Running Simulations
 ----------------------
 We use "test-scripts/prun.sh," a reasonably automated script to run the
