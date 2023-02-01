@@ -216,6 +216,14 @@ test-scripts/parallel-gups.md
 
 You could also do it manually as shown below (for tiny input):
 
+First, set the environmental variables.
+```
+export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
+source scripts/setvars.sh $OS_RELEASE_NAME
+```
+
+Next,
+
 ```
 exec test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_INPUT &
 ```
@@ -253,13 +261,13 @@ Mosaic TLB miss rate:0.6414%
 
 For large inputs (e.g., xsbench)
 ```
-exec test-scripts/prun.sh xsbench 2 4 3160 1 &
+exec test-scripts/prun.sh xsbench 2 4 13160 1 &
 sleep 60
-exec test-scripts/prun.sh xsbench 4 4 3161 1 &
+exec test-scripts/prun.sh xsbench 4 4 13161 1 &
 sleep 60
-exec test-scripts/prun.sh xsbench 8 4 3162 1 &
+exec test-scripts/prun.sh xsbench 8 4 13162 1 &
 sleep 60
-exec test-scripts/prun.sh xsbench 1024 4 3163 1
+exec test-scripts/prun.sh xsbench 1024 4 13163 1
 sleep 60
 ```
 
