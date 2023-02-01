@@ -268,7 +268,6 @@ sleep 60
 exec test-scripts/prun.sh xsbench 8 4 13162 1 &
 sleep 60
 exec test-scripts/prun.sh xsbench 1024 4 13163 1
-sleep 60
 ```
 
 ### 3.4 Setting TLB size
