@@ -152,6 +152,7 @@ check_tlblogs_exist () {
 		    echo "RESULTS for APP: $APPNAME WAYS: $WAYS_VAL and TOCSIZE: $TOC_LEN"
 		    echo "----------------------------------------------------------"
 		    cat $TLBRESULT 	
+		    echo "----------------------------------------------------------"
 
         	    #move tlblogs to result directory
             	    move_stats_to_results_dir $FILE $2 $3 $4

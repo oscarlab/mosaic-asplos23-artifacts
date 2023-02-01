@@ -30,7 +30,7 @@ elif appname == "gups":
 else:
     commands = [b"/m5 exit\r\n", b"/seq-list -s 4 -e 4\r\n", b"/m5 exit\r\n" ]
 
-print(commands)
+#print(commands)
 
 with Telnet(server, port) as tn:
     tn.read_until(b"login: ")

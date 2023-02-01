@@ -216,6 +216,14 @@ test-scripts/parallel-gups.md
 
 You could also do it manually as shown below (for tiny input):
 
+First, set the environmental variables.
+```
+export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
+source scripts/setvars.sh $OS_RELEASE_NAME
+```
+
+Next,
+
 ```
 exec test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_INPUT &
 ```
@@ -226,12 +234,10 @@ exec test-scripts/prun.sh graph500 2 4 10000 0 &
 sleep 20
 exec test-scripts/prun.sh graph500 4 4 10001 0 &
 sleep 20
-exec test-scripts/prun.sh graph500 8 4 10002 0 &
-sleep 20
-exec test-scripts/prun.sh graph500 1024 4 10003 0 
+exec test-scripts/prun.sh graph500 8 4 10002 0
 ```
 
-We note that gem5's TELNET can be, at times, unstable. If you see a "connection refused error" for some specific configuration, we recommend re-running just the specific configuration.
+We note that gem5's TELNET can be, at times, unstable for simultaneous telnet invocation. If you see a "connection refused error" for some specific configuration, we recommend either re-running just the specific configuration or terminating all instances using step 3.6 below and increasing the sleep time between each execution. 
 
 
 The above commands would generate a (sample) output in the format shown below:
@@ -251,23 +257,17 @@ RESULTS for WAYS 8 and TOC LEN 4
 ----------------------------------------------------------
 Vanilla TLB miss rate:0.9007%
 Mosaic TLB miss rate:0.6414%
-----------------------------------------------------------
-RESULTS for WAYS 1024 and TOC LEN 4
-----------------------------------------------------------
-Vanilla TLB miss rate:0.6971%
-Mosaic TLB miss rate:0.6716%
 ```
 
 For large inputs (e.g., xsbench)
 ```
-exec test-scripts/prun.sh xsbench 2 4 3160 1 &
+exec test-scripts/prun.sh xsbench 2 4 13160 1 &
 sleep 60
-exec test-scripts/prun.sh xsbench 4 4 3161 1 &
+exec test-scripts/prun.sh xsbench 4 4 13161 1 &
 sleep 60
-exec test-scripts/prun.sh xsbench 8 4 3162 1 &
+exec test-scripts/prun.sh xsbench 8 4 13162 1 &
 sleep 60
-exec test-scripts/prun.sh xsbench 1024 4 3163 1 &
-sleep 60
+exec test-scripts/prun.sh xsbench 1024 4 13163 1
 ```
 
 ### 3.4 Setting TLB size
@@ -298,7 +298,7 @@ PID=`ps axf | grep prun.sh | grep -v grep | awk '{print $1}'`;kill -9 $PID
 ```
 
 ## (4.) Result Generation
--------------------
+-------------------------
 In full system simulation, for each memory reference, we use a Vanilla TLB and
 a parallel Iceberg TLB to collect the TLB miss rate for both Vanilla and
 Mosaic.
