@@ -12,10 +12,10 @@ cd ../
 COPYDIR=$PWD
 cd $BASE
 
-if [ "$#" -ne 5 ]; then
+if [ "$#" -ne 4 ]; then
     echo "Illegal number of parameters. Check README"
     echo "Format: test-scripts/prun.sh "appname" "associativity ways" "toc size" "tcp port" "large input?""
-    echo "example: test-scripts/prun.sh graph500 2 4 3160 0"
+    echo "example: test-scripts/prun.sh graph500 2 3160 0"
     exit
 fi
 
@@ -32,9 +32,9 @@ GEM5_VANILLA=$COPYDIR/vanilla
 #Iceberg TOC list
 APPNAME=$1
 WAYS=$2
-TOC=$3
-TCP_PORT=$4
-USE_LARGE_WORKLOAD=$5
+TOC=1
+TCP_PORT=$3
+USE_LARGE_WORKLOAD=$4
 
 
 GEM5_RESULTS_DIR=result
@@ -141,7 +141,7 @@ check_tlblogs_exist () {
 		    #cat $TLBLOGS | grep "Mosaic TLB miss rate" | tail -1 &>> $TLBRESULT
 
 		    echo "----------------------------------------------------------"
-		    echo "RESULTS for APP: $APPNAME WAYS: $WAYS_VAL and TOCSIZE: $TOC_LEN"
+		    echo "RESULTS for APP: $APPNAME WAYS: $WAYS_VAL"
 		    echo "----------------------------------------------------------"
 		    cat $TLBRESULT 	
 		    echo "----------------------------------------------------------"

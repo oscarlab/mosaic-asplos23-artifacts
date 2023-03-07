@@ -1142,7 +1142,7 @@ TLB::regStats()
 
 	registerDumpCallback(new TLBDumpCallback(this));*/
 	showStats();
-	aprox_tot_instructs += 100000000;
+	aprox_tot_instructs += 10000000;
 
 }
 
@@ -1164,7 +1164,7 @@ TLB::showStats()
 			fprintf(tlblog,"Total TLB size:%d\n",L1size);
 
 
-			if(totalaccessesL1 > 0LL)
+			if(totalaccessesL1 > 0LL && !simulateIceberg)
 			{
 
 				double total_accesses = (double)totalreadaccessL1 + (double)totalwriteaccessL1;

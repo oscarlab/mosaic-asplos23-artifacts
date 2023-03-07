@@ -204,9 +204,42 @@ and a specific PORT number.
 
 ### 3.3 Running the gem5 simulator with Vanilla
 ```
-test-scripts/pvanilla.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_INPUT
+test-scripts/pvanilla.sh $APPNAME $ASSOCIATIVITY $TELNET_PORT $USE_LARGE_INPUT
 ```
 The steps for running Vanilla design is same except the script name.
+
+#### Examples:
+To run graph500, xsbench, btree, gups sequentially (one after the other) with  2-way associativity with **tiny input**
+
+```
+export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
+source scripts/setvars.sh $OS_RELEASE_NAME
+
+To run just graph500
+```
+test-scripts/pvanilla.sh graph500 2  10160 0
+```
+
+The output appears in the format follows:
+```
+RESULTS for APP: graph500 WAYS: 2
+----------------------------------------------------------
+Vanilla TLB miss rate:0.7265%
+----------------------------------------------------------
+```
+
+To run all workloads:
+
+```
+test-scripts/pvanilla.sh graph500 2  10160 0
+sleep 20
+test-scripts/pvanilla.sh xsbench 2  10161 0
+sleep 20
+test-scripts/pvanilla.sh btree 2 10162 0
+sleep 20
+test-scripts/pvanilla.sh gups 2 10163 0
+sleep 20
+```
 
 
 ### 3.4 To run multiple Mosaic instances simultaneously
@@ -252,17 +285,14 @@ The above commands would generate a (sample) output in the format shown below:
 ----------------------------------------------------------
 RESULTS for WAYS 2 and TOC LEN 4
 ----------------------------------------------------------
-Vanilla TLB miss rate:0.9288%
 Mosaic TLB miss rate:0.6426%
 ----------------------------------------------------------
 RESULTS for WAYS 4 and TOC LEN 4
 ----------------------------------------------------------
-Vanilla TLB miss rate:0.8835%
 Mosaic TLB miss rate:0.6312%
 ----------------------------------------------------------
 RESULTS for WAYS 8 and TOC LEN 4
 ----------------------------------------------------------
-Vanilla TLB miss rate:0.9007%
 Mosaic TLB miss rate:0.6414%
 ```
 

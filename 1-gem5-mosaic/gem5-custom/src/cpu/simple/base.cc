@@ -182,7 +182,7 @@ BaseSimpleCPU::countInst()
     system->totalNumInsts++;
     t_info.thread->funcExeInst++;
     //print tlb stats after each 1 billion instructions
-    if (system->totalNumInsts%100000000==0) {
+    if (system->totalNumInsts%10000000==0) {
         printf("%ld instructions\n",system->totalNumInsts);
         SimpleExecContext &t_info = *threadInfo[curThread];
         SimpleThread* thread = t_info.thread;
