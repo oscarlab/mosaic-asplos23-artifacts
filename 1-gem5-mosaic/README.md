@@ -356,4 +356,6 @@ result/$APP/iceberg/$ASSOCIATIVTY/$TOCSIZE
 e.g., result/graph500/iceberg/2way/toc4
 ```
 
+You could also see the TLB hit and miss logs for each 10M instructions in *tlblogs* file.
+
 
