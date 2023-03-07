@@ -144,7 +144,7 @@ export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
 source scripts/setvars.sh $OS_RELEASE_NAME
 ```
 
-### 3.2 Running the gem5 simulator
+### 3.2 Running the gem5 simulator with Mosaic 
 ```
 test-scripts/prun.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_INPUT
 ```
@@ -202,7 +202,14 @@ To avoid manually logging into a VM and running an application, we use telnet
 and a specific PORT number.
 
 
-### 3.3 To run multiple instances simultaneously
+### 3.3 Running the gem5 simulator with Vanilla
+```
+test-scripts/pvanilla.sh $APPNAME $ASSOCIATIVITY $TOCSIZE $TELNET_PORT $USE_LARGE_INPUT
+```
+The steps for running Vanilla design is same except the script name.
+
+
+### 3.4 To run multiple Mosaic instances simultaneously
 To run multiple instances in parallel, the instances could be run as background (interactive) tasks.
 Simply copy the block from each markdown file and paste it on the terminal for the long running jobs to begin.
 The number of jobs to launch depend on the number of cores, memory size, and available disk size.
@@ -270,14 +277,14 @@ sleep 60
 exec test-scripts/prun.sh xsbench 1024 4 13163 1
 ```
 
-### 3.4 Setting TLB size
+### 3.5 Setting TLB size
 To change the default TLB size, in prun.sh, change the following:
 ```
 TLB_SIZE=1024 => TLB_SIZE=1536
 ```
 
 
-### 3.5 Changing application parameters
+### 3.6 Changing application parameters
 The inputs for tiny and large inputs for each application can be changed in the follow python scripts
 ```
 $BASE/test-scripts/gem5_client_tiny.py
@@ -290,7 +297,7 @@ commands = [b"/m5 exit\r\n", b"/seq-list -s 4 -e 4\r\n", b"/m5 exit\r\n" ]
 ```
 
 
-### 3.6 Forceful termination if required
+### 3.7 Forceful termination if required
 If you would like to terminate all scripts and gem5 simulation, one could use the following commands
 ```
 PID=`ps axf | grep Ways | grep -v grep | awk '{print $1}'`;kill -9 $PID
@@ -308,8 +315,6 @@ are printed as shown below.
 
 ```
 Sample output:
-
-Vanilla TLB miss rate:1.1046%
 Mosaic TLB miss rate:0.7307%
 ```
 ## 4.1 Result Files

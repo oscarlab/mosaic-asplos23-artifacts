@@ -134,6 +134,8 @@ TLB::TLB(const Params *p)
 
     toc_bits = floorLog2(toc_size);
 
+    aprox_tot_instructs = 0LL;
+
     totalaccessesL1 = 0LL;
     missesL1 = 0LL;
     totalreadaccessL1 = 0LL;
@@ -142,6 +144,7 @@ TLB::TLB(const Params *p)
     writemissesL1 = 0LL;
     insertsL1 = 0LL;
     lruevictsL1 = 0LL;
+    lruIBevictsL1 = 0LL;
 
     totalaccessesIBL1 = 0LL;
     missesIBL1 = 0LL;
@@ -190,7 +193,7 @@ TLB::evictLRUL1()
     L1trie.remove(L1tlb[lru].trieHandle);
     L1tlb[lru].trieHandle = NULL;
     L1freeList.push_back(&L1tlb[lru]);
-    lruevictsL1++;
+    //lruevictsL1++;
 }
 
 void
@@ -211,7 +214,7 @@ TLB::evictLRUIBL1()
     L1IBtrie.remove(L1IBtlb[lru].trieHandle);
     L1IBtlb[lru].trieHandle = NULL;
     L1IBfreeList.push_back(&L1IBtlb[lru]);
-    lruevictsL1++;
+    //lruevictsL1++;
 }
 
 void
@@ -230,7 +233,7 @@ TLB::evictLRUL2()
     L2trie.remove(L2tlb[lru].trieHandle);
     L2tlb[lru].trieHandle = NULL;
     L2freeList.push_back(&L2tlb[lru]);
-    lruevictsL2++;
+    //lruevictsL2++;
 }
 
 void
@@ -254,6 +257,7 @@ TLB::evictLRUL1SetAssociative(int setNumber)
         }
         cnt++;
     }
+    lruevictsL1++;
 }
 
 void
@@ -277,6 +281,7 @@ TLB::evictLRUIBL1SetAssociative(int setNumber)
         }
         cnt++;
     }
+    lruIBevictsL1++;
 }
 
 TlbEntry *
@@ -808,9 +813,28 @@ TLB::finalizePhysical(RequestPtr req, ThreadContext *tc, Mode mode) const
 }
 
 
+void
+TLB::update_iceberg_stats(Mode mode)
+{
+    totalaccessesIBL1++;
+    if (mode == Read) {
+        totalreadaccessIBL1++;
+    } else {
+        totalwriteaccessIBL1++;
+    }
+    missesIBL1++;
+    if (mode == Read) {
+        readmissesIBL1++;
+    } else {
+        writemissesIBL1++;
+    }
+}
+
+
 Fault
 TLB::translate(RequestPtr req, ThreadContext *tc, Translation *translation,
-        Mode mode, bool &delayedResponse, bool timing, bool isIcebergCheckNeeded)
+        Mode mode, bool &delayedResponse, bool timing, bool isIcebergCheckNeeded,
+        bool isIcebergPageWalkNeeded)
 {
     Request::Flags flags = req->getFlags();
     int seg = flags & SegmentFlagMask;
@@ -931,15 +955,21 @@ TLB::translate(RequestPtr req, ThreadContext *tc, Translation *translation,
                 if (isMiss)
                 {
                 	if (FullSystem) {
-                	    //printf("vanilla tlb miss for vaddr %012x\n",(unsigned int)vaddr);
-                        Fault fault = walker->start(tc, translation, req, mode);
-                        if (timing || fault != NoFault) {
-                            // This gets ignored in atomic mode.
-                            delayedResponse = true;
-                            return fault;
-                        }
-                        entry = lookupL1(vaddr);
-                        assert(entry);
+				    //printf("vanilla tlb miss for vaddr %012x\n",(unsigned int)vaddr);
+				Fault fault = walker->start(tc, translation, req, mode);
+				if (timing || fault != NoFault) {
+				    // This gets ignored in atomic mode.
+				    delayedResponse = true;
+                            totalaccessesIBL1++;
+                            if (mode == Read) {
+                                totalreadaccessIBL1++;
+                            } else {
+                                totalwriteaccessIBL1++;
+                            }
+				    return fault;
+				}
+				entry = lookupL1(vaddr);
+				assert(entry);
                 	} else {
                     	Process *p = tc->getProcessPtr();
                     	const EmulationPageTable::Entry *pte =
@@ -1009,10 +1039,12 @@ TLB::translate(RequestPtr req, ThreadContext *tc, Translation *translation,
                     } else {
                         writemissesIBL1++;
                     }
-                    Fault fault = walker->start(tc, translation, req, mode,
+                    Fault fault = NoFault;
+                    if (isIcebergPageWalkNeeded)
+                        fault = walker->start(tc, translation, req, mode,
                     	                                            false /*not a walk for delete*/,
                     	                                            true /*walk for building toc*/);
-                    if (timing || fault != NoFault) {
+                    if (timing /*|| fault != NoFault*/) {
                         // This gets ignored in atomic mode.
                         delayedResponse = true;
                         return fault;
@@ -1090,7 +1122,7 @@ TLB::getWalker()
 void
 TLB::regStats()
 {
-    using namespace Stats;
+    /*using namespace Stats;
 
     rdAccesses
         .name(name() + ".rdAccesses")
@@ -1108,7 +1140,10 @@ TLB::regStats()
         .name(name() + ".wrMisses")
         .desc("TLB misses on write requests");
 
-	registerDumpCallback(new TLBDumpCallback(this));
+	registerDumpCallback(new TLBDumpCallback(this));*/
+	showStats();
+	aprox_tot_instructs += 100000000;
+
 }
 
 void
@@ -1134,7 +1169,7 @@ TLB::showStats()
 
 				double total_accesses = (double)totalreadaccessL1 + (double)totalwriteaccessL1;
 				double total_misses = (double)readmissesL1 + (double)writemissesL1;
-
+				fprintf(tlblog,"approx CPU instructions %lld\n",aprox_tot_instructs);
 				fprintf(tlblog,"total tlb accesses:%lld\n",totalaccessesL1);
 				fprintf(tlblog,"total tlb misses:%lld\n",missesL1);
 				fprintf(tlblog,"tlb miss rate:%.4f%%\n",((double)missesL1/(double)totalaccessesL1)*100);
@@ -1145,6 +1180,7 @@ TLB::showStats()
 				fprintf(tlblog,"total tlb-stores misses:%lld\n",writemissesL1);
 				fprintf(tlblog,"tlb-stores miss rate:%.4f%%\n",((double)writemissesL1/(double)totalwriteaccessL1)*100);
 				fprintf(tlblog,"Vanilla TLB miss rate:%.4f%%\n",((double)total_misses/(double)total_accesses)*100);
+				fprintf(tlblog,"Vanilla TLB evicts %lld\n",lruevictsL1);
 				fprintf(tlblog,"============================================================\n");
 			}
 
@@ -1159,7 +1195,7 @@ TLB::showStats()
 
 				double total_iceberg_accesses = (double)totalreadaccessIBL1 + (double)totalwriteaccessIBL1;
 				double total_iceberg_misses = (double)readmissesIBL1 + (double)writemissesIBL1;
-
+				fprintf(tlblog,"approx CPU instructions %lld\n",aprox_tot_instructs);
 				fprintf(tlblog,"total Iceberg TLB accesses:%lld\n",totalaccessesIBL1);
 				fprintf(tlblog,"total Iceberg TLB misses:%lld\n",missesIBL1);
 				fprintf(tlblog,"Iceberg TLB miss rate:%.4f%%\n",((double)missesIBL1/(double)totalaccessesIBL1)*100);
@@ -1170,6 +1206,7 @@ TLB::showStats()
 				fprintf(tlblog,"total Iceberg tlb-stores misses:%lld\n",writemissesIBL1);
 				fprintf(tlblog,"Iceberg tlb-stores miss rate:%.4f%%\n",((double)writemissesIBL1/(double)totalwriteaccessIBL1)*100);
 				fprintf(tlblog,"Mosaic TLB miss rate:%.4f%%\n",((double)total_iceberg_misses/(double)total_iceberg_accesses)*100);
+				fprintf(tlblog,"Mosaic TLB evicts %lld",lruIBevictsL1);
 				fprintf(tlblog,"============================================================\n");
 			    }
 			}
@@ -1194,7 +1231,7 @@ TLB::showStats()
 	}
 
     //resetting stats
-    totalaccessesL1 = 0LL;
+    /*totalaccessesL1 = 0LL;
     missesL1 = 0LL;
     totalreadaccessL1 = 0LL;
     totalwriteaccessL1 = 0LL;
@@ -1218,7 +1255,7 @@ TLB::showStats()
     writemissesL2 = 0LL;
     lruevictsL2 = 0LL;
 
-    flushAll();
+    flushAll();*/
 }
 
 void

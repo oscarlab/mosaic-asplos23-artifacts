@@ -154,6 +154,7 @@ namespace X86ISA
         Stats::Scalar rdMisses;
         Stats::Scalar wrMisses;
 
+	long long int aprox_tot_instructs;
         long long int totalaccessesL1;
         long long int totalreadaccessL1;
         long long int totalwriteaccessL1;
@@ -162,6 +163,7 @@ namespace X86ISA
         long long int writemissesL1;
         long long int insertsL1;
         long long int lruevictsL1;
+        long long int lruIBevictsL1;
 
         //iceberg stats
         long long int totalaccessesIBL1;
@@ -184,7 +186,10 @@ namespace X86ISA
         Fault translate(RequestPtr req, ThreadContext *tc,
                 Translation *translation, Mode mode,
                 bool &delayedResponse, bool timing,
-                bool isIcebergCheckNeeded = true);
+                bool isIcebergCheckNeeded = true,
+                bool isIcebergPageWalkNeeded = true);
+
+        void update_iceberg_stats(Mode mode);
 
       public:
 

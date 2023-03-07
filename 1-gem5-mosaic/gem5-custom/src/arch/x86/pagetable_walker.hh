@@ -128,6 +128,7 @@ namespace X86ISA
                            bool _isTiming = false);
             Fault startWalk();
             Fault startFunctional(Addr &addr, unsigned &logBytes);
+            void handle_iceberg_tlb_miss();
             bool recvPacket(PacketPtr pkt);
             bool isRetrying();
             bool wasStarted();

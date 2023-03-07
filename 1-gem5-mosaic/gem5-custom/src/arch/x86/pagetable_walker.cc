@@ -670,16 +670,17 @@ Walker::WalkerState::stepWalk(PacketPtr &write)
             entry.global = pte.g;
             entry.uncacheable = uncacheable;
             entry.paddr = 0;
-            if (TOC_offset == walker->toc_size - 1) {
-                doEndWalk = true;
-                doTLBInsert = true;
-            } else if (TOC_offset == 0) {
+            if (TOC_offset == 0) {
                 entry.logBytes = 12 + walker->toc_bits;
                 start_TOC_building = 1;
                 entry.TOC = (uint8_t *)malloc(walker->toc_size*sizeof(uint8_t));
                 for (int i=0; i<walker->toc_size; i++) {
                     entry.TOC[i] = 0;
                 }
+            }
+            if (TOC_offset == walker->toc_size - 1) {
+                doEndWalk = true;
+                doTLBInsert = true;
             }
             entry.TOC[TOC_offset] = toc_i;
             TOC_offset++;
@@ -924,6 +925,13 @@ Walker::WalkerState::setupWalk(Addr vaddr)
     read->allocate();
 }
 
+void
+Walker::WalkerState::handle_iceberg_tlb_miss()
+{
+    //walker->tlb->update_iceberg_stats(mode);
+    walker->start(tc, translation, req, mode, false, true);
+}
+
 bool
 Walker::WalkerState::recvPacket(PacketPtr pkt)
 {
@@ -991,13 +999,20 @@ Walker::WalkerState::recvPacket(PacketPtr pkt)
             	 * well.
             	 */
             	bool delayedResponse;
-            	Fault fault = walker->tlb->translate(req, tc, NULL, mode,
+            	//printf("walk completed in recvpacket\n");
+            	Fault fault = walker->tlb->translate(req, tc, translation, mode,
                                                  delayedResponse, true,
-                                                 false /*do not do iceberg tlb lookup*/);
-            	assert(!delayedResponse);
+                                                 true /*do/don't iceberg tlb lookup*/,
+                                                 false /*do not add iceberg pagewalk if iceberg miss*/);
+            	//assert(!delayedResponse);
             	// Let the CPU continue.
-            	translation->finish(fault, req, tc, mode);
-            	//printf("finishing translation\n");
+            	if (delayedResponse) {
+            	    //iceberg TLB miss
+            	    //handle here
+            	    //printf("recv iceberg for vanilla miss %016lx\n", req->getVaddr());
+            	    handle_iceberg_tlb_miss();
+            	} else
+            	    translation->finish(fault, req, tc, mode);
 
             	walker->totalPageWalkTicks += curTick() - walkStartTick;
         	} else {
@@ -1091,11 +1106,19 @@ Walker::WalkerState::sendPackets()
             	// permissions violations, so we'll need the return value as
             	// well.
             	bool delayedResponse;
-            	Fault fault = walker->tlb->translate(req, tc, NULL, mode,
-                                                 delayedResponse, true);
-            	assert(!delayedResponse);
-            	// Let the CPU continue.
-            	translation->finish(fault, req, tc, mode);
+            	Fault fault = walker->tlb->translate(req, tc, translation, mode,
+                                                 delayedResponse, true,
+                                                 true, /*do/don't iceberg tlb lookup*/
+                                                 false  /*do not walk on iceberg miss*/);
+            	//assert(!delayedResponse);
+            	if (delayedResponse) {
+            	    //iceberg TLB miss
+            	    //handle here
+            	    //printf("send iceberg for vanilla miss %016lx\n", req->getVaddr());
+            	    handle_iceberg_tlb_miss();
+            	} else
+            	    // Let the CPU continue.
+            	    translation->finish(fault, req, tc, mode);
 
 				walker->totalPageWalkTicks += curTick() - walkStartTick;
         	}
@@ -1138,6 +1161,7 @@ Fault
 Walker::WalkerState::pageFault(bool present)
 {
 	walker->numpgfaults++;
+	walker->tlb->update_iceberg_stats(mode);
     DPRINTF(PageTableWalker, "Raising page fault.\n");
     HandyM5Reg m5reg = tc->readMiscRegNoEffect(MISCREG_M5_REG);
     if (mode == BaseTLB::Execute && !enableNX)
