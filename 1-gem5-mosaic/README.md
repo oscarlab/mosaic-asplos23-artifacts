@@ -214,6 +214,7 @@ To run graph500, xsbench, btree, gups sequentially (one after the other) with  2
 ```
 export OS_RELEASE_NAME=`lsb_release -a | grep "Codename:" | awk '{print $2}'`
 source scripts/setvars.sh $OS_RELEASE_NAME
+```
 
 To run just graph500
 ```
